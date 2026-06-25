@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EconLab BD — Economics Learning Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#0F1117;--bg2:#181B24;--bg3:#21263A;--border:#2A3050;
+  --accent:#4F8EF7;--accent2:#34D399;--accent3:#F59E0B;--accent4:#F472B6;
+  --text:#E8EAED;--muted:#8A94B2;--danger:#F87171;
+  --radius:12px;--radius-sm:8px;--font:'Segoe UI',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+.header{background:linear-gradient(135deg,#0F1117,#1a1f35);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px}
+.tagline{font-size:11px;color:var(--muted)}
+.nav-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto;scrollbar-width:none}
+.nav-wrap::-webkit-scrollbar{display:none}
+.nav{display:flex;gap:2px;min-width:max-content}
+.nav-btn{padding:11px 15px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:var(--font);white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:5px}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.page{display:none;padding:24px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+.module-title{font-size:21px;font-weight:700;margin-bottom:4px}
+.module-desc{font-size:13px;color:var(--muted);margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.card:last-child{margin-bottom:0}
+.card-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px}
+.ctrl{margin-bottom:12px}
+.ctrl:last-child{margin-bottom:0}
+.ctrl-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.ctrl-label{font-size:12px;color:var(--muted)}
+.ctrl-val{font-size:12px;font-weight:600;color:var(--accent);background:rgba(79,142,247,.1);padding:1px 8px;border-radius:20px}
+input[type=range]{width:100%;-webkit-appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 6px rgba(79,142,247,.5)}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.metric{background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border)}
+.metric-label{font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.metric-val{font-size:18px;font-weight:700}
+.metric-change{font-size:10px;margin-top:2px}
+.up{color:var(--accent2)}.down{color:var(--danger)}.neu{color:var(--muted)}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.chart-title{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:12px}
+.chart-container{position:relative;height:300px}
+.explain{margin-top:12px;background:linear-gradient(135deg,rgba(79,142,247,.07),rgba(52,211,153,.05));border:1px solid rgba(79,142,247,.18);border-radius:var(--radius-sm);padding:11px 14px;font-size:12px;color:var(--muted);line-height:1.65}
+.explain strong{color:var(--accent2)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.leg-line{width:16px;height:3px;border-radius:2px;flex-shrink:0}
+.sel-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sel-btn{padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .2s}
+.sel-btn.active{background:rgba(79,142,247,.15);border-color:var(--accent);color:var(--accent)}
+/* HOME */
+.home-hero{text-align:center;padding:50px 24px 36px}
+.home-hero h1{font-size:38px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px}
+.home-hero p{color:var(--muted);font-size:14px;max-width:460px;margin:0 auto 28px;line-height:1.7}
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;max-width:880px;margin:0 auto}
+.mod-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s}
+.mod-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,142,247,.12)}
+.mod-card-icon{font-size:22px;margin-bottom:8px}
+.mod-card-name{font-size:13px;font-weight:600;margin-bottom:3px}
+.mod-card-desc{font-size:11px;color:var(--muted);line-height:1.4}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}.page{padding:14px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="logo">⚗️ EconLab BD</div>
+    <div class="tagline">Interactive Economics Learning Platform — চট্টগ্রাম বিশ্ববিদ্যালয় ইকোনোমিক্স ডিপার্টমেন্ট</div>
+  </div>
+</div>
+<div class="nav-wrap">
+  <div class="nav">
+    <button class="nav-btn active" onclick="showPage('home')">🏠 Home</button>
+    <button class="nav-btn" onclick="showPage('islm')">🏛️ IS-LM</button>
+    <button class="nav-btn" onclick="showPage('adas')">📈 AD-AS</button>
+    <button class="nav-btn" onclick="showPage('money')">💰 Money Market</button>
+    <button class="nav-btn" onclick="showPage('labor')">👷 Labor Market</button>
+    <button class="nav-btn" onclick="showPage('trade')">🌍 Trade & FX</button>
+    <button class="nav-btn" onclick="showPage('phillips')">📉 Phillips Curve</button>
+    <button class="nav-btn" onclick="showPage('banking')">🏦 Banking</button>
+    <button class="nav-btn" onclick="showPage('growth')">📊 Growth Model</button>
+    <button class="nav-btn" onclick="showPage('market')">📦 Market Structure</button>
+    <button class="nav-btn" onclick="showPage('fiscal')">🎯 Fiscal Policy</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="home-hero">
+    <h1>EconLab BD</h1>
+    <p>ইকোনোমিক্সের ১০টি মূল মডেল — ইন্টারেক্টিভ সিমুলেটর দিয়ে শিখুন, পরীক্ষা করুন, বুঝুন। সম্পূর্ণ বিনামূল্যে।</p>
+  </div>
+  <div class="mod-grid">
+    <div class="mod-card" onclick="showPage('islm')"><div class="mod-card-icon">🏛️</div><div class="mod-card-name">IS-LM Simulator</div><div class="mod-card-desc">Macroeconomic Policy Lab — আয় ও সুদের হারের ভারসাম্য</div></div>
+    <div class="mod-card" onclick="showPage('adas')"><div class="mod-card-icon">📈</div><div class="mod-card-name">AD-AS Simulator</div><div class="mod-card-desc">Inflation & Growth Lab — মূল্য স্তর ও আউটপুট</div></div>
+    <div class="mod-card" onclick="showPage('money')"><div class="mod-card-icon">💰</div><div class="mod-card-name">Money Market</div><div class="mod-card-desc">সুদের হার ও তরলতার সিমুলেশন</div></div>
+    <div class="mod-card" onclick="showPage('labor')"><div class="mod-card-icon">👷</div><div class="mod-card-name">Labor Market</div><div class="mod-card-desc">কর্মসংস্থান ও মজুরির গতিপ্রকৃতি</div></div>
+    <div class="mod-card" onclick="showPage('trade')"><div class="mod-card-icon">🌍</div><div class="mod-card-name">Trade & Exchange Rate</div><div class="mod-card-desc">আন্তর্জাতিক বাণিজ্য ও মুদ্রার মান</div></div>
+    <div class="mod-card" onclick="showPage('phillips')"><div class="mod-card-icon">📉</div><div class="mod-card-name">Phillips Curve</div><div class="mod-card-desc">মুদ্রাস্ফীতি ও বেকারত্বের সম্পর্ক</div></div>
+    <div class="mod-card" onclick="showPage('banking')"><div class="mod-card-icon">🏦</div><div class="mod-card-name">Banking System</div><div class="mod-card-desc">মানি মাল্টিপ্লায়ার ও ঋণ সম্প্রসারণ</div></div>
+    <div class="mod-card" onclick="showPage('growth')"><div class="mod-card-icon">📊</div><div class="mod-card-name">Solow Growth Model</div><div class="mod-card-desc">দীর্ঘমেয়াদী প্রবৃদ্ধির কারণ ও গতি</div></div>
+    <div class="mod-card" onclick="showPage('market')"><div class="mod-card-icon">📦</div><div class="mod-card-name">Market Structure</div><div class="mod-card-desc">প্রতিযোগিতা, একচেটিয়া ও তুলনা</div></div>
+    <div class="mod-card" onclick="showPage('fiscal')"><div class="mod-card-icon">🎯</div><div class="mod-card-name">Fiscal Policy Budget</div><div class="mod-card-desc">সরকারি বাজেট ও অর্থনৈতিক প্রভাব</div></div>
+  </div>
+</div>
+
+<!-- MODULE 1: IS-LM -->
+<div id="page-islm" class="page">
+  <div class="module-title">🏛️ IS-LM Simulator <span style="font-size:13px;color:var(--muted);font-weight:400">— Macroeconomic Policy Lab</span></div>
+  <div class="module-desc">Goods market ও Money market-এর যুগপৎ ভারসাম্য। Policy পরিবর্তন করলে Y* ও r* কীভাবে বদলায় দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">💰 Fiscal Policy Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Government Spending (G)</span><span class="ctrl-val" id="islm-g-val">50</span></div><input type="range" min="10" max="100" value="50" id="islm-g" oninput="islmUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Tax Rate (T)</span><span class="ctrl-val" id="islm-t-val">30</span></div><input type="range" min="0" max="80" value="30" id="islm-t" oninput="islmUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">MPC (Consumption Propensity)</span><span class="ctrl-val" id="islm-mpc-val">0.70</span></div><input type="range" min="50" max="90" value="70" id="islm-mpc" oninput="islmUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏦 Monetary Policy Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Money Supply (M)</span><span class="ctrl-val" id="islm-m-val">100</span></div><input type="range" min="50" max="200" value="100" id="islm-m" oninput="islmUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Investment Sensitivity</span><span class="ctrl-val" id="islm-inv-val">5</span></div><input type="range" min="1" max="10" value="5" id="islm-inv" oninput="islmUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Real-Time Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">National Income Y*</div><div class="metric-val" id="islm-Y">—</div><div class="metric-change" id="islm-Ych"></div></div>
+          <div class="metric"><div class="metric-label">Interest Rate r*</div><div class="metric-val" id="islm-R">—</div><div class="metric-change" id="islm-Rch"></div></div>
+          <div class="metric"><div class="metric-label">Investment (I)</div><div class="metric-val" id="islm-I">—</div></div>
+          <div class="metric"><div class="metric-label">Consumption (C)</div><div class="metric-val" id="islm-C">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">IS Curve & LM Curve — Equilibrium Point</div>
+        <div class="chart-container"><canvas id="islmChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> IS Curve</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> LM Curve</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Equilibrium (Y*, r*)</div>
+        </div>
+        <div class="explain" id="islm-explain">স্লাইডার পরিবর্তন করুন এবং দেখুন IS ও LM কার্ভ কীভাবে সরে যায়।</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 2: AD-AS -->
+<div id="page-adas" class="page">
+  <div class="module-title">📈 AD-AS Simulator <span style="font-size:13px;color:var(--muted);font-weight:400">— Inflation & Growth Lab</span></div>
+  <div class="module-desc">Aggregate Demand ও Supply-এর ভারসাম্য। মুদ্রাস্ফীতি, GDP ও Stagflation কীভাবে তৈরি হয় দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">📊 Demand Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Consumer Confidence</span><span class="ctrl-val" id="ad-cc-val">50</span></div><input type="range" min="10" max="100" value="50" id="ad-cc" oninput="adasUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Government Spending (G)</span><span class="ctrl-val" id="ad-g-val">50</span></div><input type="range" min="10" max="100" value="50" id="ad-g" oninput="adasUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Money Supply (M)</span><span class="ctrl-val" id="ad-m-val">100</span></div><input type="range" min="50" max="200" value="100" id="ad-m" oninput="adasUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Export Demand (X)</span><span class="ctrl-val" id="ad-x-val">50</span></div><input type="range" min="10" max="100" value="50" id="ad-x" oninput="adasUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏭 Supply Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Wage Cost</span><span class="ctrl-val" id="as-w-val">50</span></div><input type="range" min="10" max="100" value="50" id="as-w" oninput="adasUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Oil Price Shock</span><span class="ctrl-val" id="as-o-val">50</span></div><input type="range" min="10" max="100" value="50" id="as-o" oninput="adasUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Technology Level</span><span class="ctrl-val" id="as-tech-val">50</span></div><input type="range" min="10" max="100" value="50" id="as-tech" oninput="adasUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Productivity</span><span class="ctrl-val" id="as-prod-val">50</span></div><input type="range" min="10" max="100" value="50" id="as-prod" oninput="adasUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Real-Time Result</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Price Level (P*)</div><div class="metric-val" id="ad-P">—</div><div class="metric-change" id="ad-Pch"></div></div>
+          <div class="metric"><div class="metric-label">Real GDP (Y*)</div><div class="metric-val" id="ad-Y">—</div><div class="metric-change" id="ad-Ych"></div></div>
+          <div class="metric"><div class="metric-label">Inflation</div><div class="metric-val" id="ad-inf">—</div></div>
+          <div class="metric"><div class="metric-label">Unemployment</div><div class="metric-val" id="ad-unemp">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">AD, SRAS & LRAS Curves</div>
+        <div class="chart-container"><canvas id="adasChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> AD Curve</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> SRAS Curve</div>
+          <div class="leg"><div class="leg-line" style="background:#F472B6"></div> LRAS (Vertical)</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Equilibrium</div>
+        </div>
+        <div class="explain" id="adas-explain">Demand ও Supply controls পরিবর্তন করুন।</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 3: MONEY MARKET -->
+<div id="page-money" class="page">
+  <div class="module-title">💰 Money Market Simulator</div>
+  <div class="module-desc">কেন্দ্রীয় ব্যাংকের নীতি, মানি সাপ্লাই ও চাহিদার মাধ্যমে সুদের হার কীভাবে নির্ধারণ হয়।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🏦 Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Money Supply (MS)</span><span class="ctrl-val" id="mm-ms-val">100</span></div><input type="range" min="50" max="200" value="100" id="mm-ms" oninput="moneyUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Money Demand Shift</span><span class="ctrl-val" id="mm-md-val">50</span></div><input type="range" min="10" max="100" value="50" id="mm-md" oninput="moneyUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Central Bank Policy Rate (%)</span><span class="ctrl-val" id="mm-cbr-val">5</span></div><input type="range" min="1" max="15" value="5" id="mm-cbr" oninput="moneyUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Interest Rate</div><div class="metric-val" id="mm-ir">—</div></div>
+          <div class="metric"><div class="metric-label">Liquidity</div><div class="metric-val" id="mm-liq">—</div></div>
+          <div class="metric"><div class="metric-label">Credit Availability</div><div class="metric-val" id="mm-cred">—</div></div>
+          <div class="metric"><div class="metric-label">Market Signal</div><div class="metric-val" id="mm-sig" style="font-size:12px">—</div></div>
+        </div>
+        <div class="explain" id="mm-explain">Money Supply বাড়ালে সুদের হার কমে।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Money Supply & Demand Curves</div>
+        <div class="chart-container"><canvas id="moneyChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Money Supply (MS)</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> Money Demand (MD)</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Equilibrium</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4: LABOR -->
+<div id="page-labor" class="page">
+  <div class="module-title">👷 Labor Market Simulator</div>
+  <div class="module-desc">শ্রম বাজারে চাহিদা ও সরবরাহের ভারসাম্য। Minimum wage, technology ও population growth-এর প্রভাব দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">👷 Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Minimum Wage</span><span class="ctrl-val" id="lab-mw-val">50</span></div><input type="range" min="10" max="100" value="50" id="lab-mw" oninput="laborUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Labor Demand (Firms)</span><span class="ctrl-val" id="lab-ld-val">50</span></div><input type="range" min="10" max="100" value="50" id="lab-ld" oninput="laborUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Technology / Automation</span><span class="ctrl-val" id="lab-tech-val">50</span></div><input type="range" min="10" max="100" value="50" id="lab-tech" oninput="laborUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Population Growth</span><span class="ctrl-val" id="lab-pop-val">50</span></div><input type="range" min="10" max="100" value="50" id="lab-pop" oninput="laborUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Employment (L)</div><div class="metric-val" id="lab-emp">—</div></div>
+          <div class="metric"><div class="metric-label">Unemployment Rate</div><div class="metric-val" id="lab-unemp">—</div></div>
+          <div class="metric"><div class="metric-label">Effective Wage</div><div class="metric-val" id="lab-wage">—</div></div>
+          <div class="metric"><div class="metric-label">Market Status</div><div class="metric-val" id="lab-surplus" style="font-size:12px">—</div></div>
+        </div>
+        <div class="explain" id="lab-explain">Minimum wage বাড়ালে labor surplus হতে পারে।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Labor Demand & Supply Curves</div>
+        <div class="chart-container"><canvas id="laborChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Labor Demand (LD)</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> Labor Supply (LS)</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Eq. Wage & Employment</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 5: TRADE -->
+<div id="page-trade" class="page">
+  <div class="module-title">🌍 International Trade & Exchange Rate Lab</div>
+  <div class="module-desc">বিনিময় হার, শুল্ক ও বিদেশি আয়ের পরিবর্তনে রপ্তানি, আমদানি ও বাণিজ্য ভারসাম্যের প্রভাব।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🌍 Trade Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Exchange Rate (BDT/USD)</span><span class="ctrl-val" id="tr-ex-val">110</span></div><input type="range" min="80" max="150" value="110" id="tr-ex" oninput="tradeUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Tariff Rate (%)</span><span class="ctrl-val" id="tr-tar-val">15</span></div><input type="range" min="0" max="50" value="15" id="tr-tar" oninput="tradeUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Import Restriction Level</span><span class="ctrl-val" id="tr-imp-val">30</span></div><input type="range" min="0" max="100" value="30" id="tr-imp" oninput="tradeUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Foreign Income</span><span class="ctrl-val" id="tr-fi-val">50</span></div><input type="range" min="10" max="100" value="50" id="tr-fi" oninput="tradeUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Exports (X)</div><div class="metric-val" id="tr-exp">—</div></div>
+          <div class="metric"><div class="metric-label">Imports (M)</div><div class="metric-val" id="tr-imp2">—</div></div>
+          <div class="metric"><div class="metric-label">Trade Balance</div><div class="metric-val" id="tr-bal">—</div></div>
+          <div class="metric"><div class="metric-label">Currency Status</div><div class="metric-val" id="tr-cur" style="font-size:11px">—</div></div>
+        </div>
+        <div class="explain" id="tr-explain">BDT দুর্বল হলে রপ্তানি বাড়ে কিন্তু আমদানি ব্যয় বেড়ে যায়।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Export & Import vs Exchange Rate</div>
+        <div class="chart-container"><canvas id="tradeChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Export Curve</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> Import Curve</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Current Position</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 6: PHILLIPS -->
+<div id="page-phillips" class="page">
+  <div class="module-title">📉 Phillips Curve Simulator</div>
+  <div class="module-desc">মুদ্রাস্ফীতি ও বেকারত্বের বিপরীত সম্পর্ক। Short-run vs Long-run Phillips Curve এবং Stagflation দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">📉 Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Inflation Expectation (%)</span><span class="ctrl-val" id="ph-exp-val">3</span></div><input type="range" min="0" max="15" value="3" id="ph-exp" oninput="phillipsUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Aggregate Demand Level</span><span class="ctrl-val" id="ph-ad-val">50</span></div><input type="range" min="10" max="100" value="50" id="ph-ad" oninput="phillipsUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Supply Shock (negative = bad)</span><span class="ctrl-val" id="ph-ss-val">0</span></div><input type="range" min="-30" max="30" value="0" id="ph-ss" oninput="phillipsUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Inflation Rate</div><div class="metric-val" id="ph-inf">—</div></div>
+          <div class="metric"><div class="metric-label">Unemployment Rate</div><div class="metric-val" id="ph-unemp">—</div></div>
+          <div class="metric"><div class="metric-label">NAIRU (Natural Rate)</div><div class="metric-val">5%</div></div>
+          <div class="metric"><div class="metric-label">Stagflation Risk</div><div class="metric-val" id="ph-stag" style="font-size:12px">—</div></div>
+        </div>
+        <div class="explain" id="ph-explain">Demand বাড়লে বেকারত্ব কমে কিন্তু মুদ্রাস্ফীতি বাড়ে।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Short-Run & Long-Run Phillips Curve</div>
+        <div class="chart-container"><canvas id="phillipsChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> SRPC (Current)</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> SRPC (Expected)</div>
+          <div class="leg"><div class="leg-dot" style="background:#F472B6"></div> LRPC at NAIRU</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Current Position</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 7: BANKING -->
+<div id="page-banking" class="page">
+  <div class="module-title">🏦 Banking & Financial System Simulator</div>
+  <div class="module-desc">Reserve requirement ও lending behavior দিয়ে মানি মাল্টিপ্লায়ার ও ঋণ সম্প্রসারণ কীভাবে কাজ করে।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🏦 Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Reserve Requirement (%)</span><span class="ctrl-val" id="bk-rr-val">10</span></div><input type="range" min="2" max="30" value="10" id="bk-rr" oninput="bankingUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Interest Rate (%)</span><span class="ctrl-val" id="bk-ir-val">8</span></div><input type="range" min="1" max="20" value="8" id="bk-ir" oninput="bankingUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Bank Lending Behavior (%)</span><span class="ctrl-val" id="bk-lb-val">70</span></div><input type="range" min="10" max="100" value="70" id="bk-lb" oninput="bankingUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Initial Deposit (৳)</span><span class="ctrl-val" id="bk-dep-val">1000</span></div><input type="range" min="100" max="5000" value="1000" step="100" id="bk-dep" oninput="bankingUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Money Multiplier</div><div class="metric-val" id="bk-mult">—</div></div>
+          <div class="metric"><div class="metric-label">Credit Expansion</div><div class="metric-val" id="bk-cred">—</div></div>
+          <div class="metric"><div class="metric-label">Total Money Created</div><div class="metric-val" id="bk-total">—</div></div>
+          <div class="metric"><div class="metric-label">Liquidity Risk</div><div class="metric-val" id="bk-risk" style="font-size:12px">—</div></div>
+        </div>
+        <div class="explain" id="bk-explain">Reserve requirement কম হলে মানি মাল্টিপ্লায়ার বেশি।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Money Multiplier Effect — Round by Round</div>
+        <div class="chart-container"><canvas id="bankingChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:#4F8EF7"></div> Loans Created</div>
+          <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div> Reserves Held</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 8: GROWTH -->
+<div id="page-growth" class="page">
+  <div class="module-title">📊 Solow Growth Model</div>
+  <div class="module-desc">সঞ্চয়, জনসংখ্যা বৃদ্ধি ও প্রযুক্তি দিয়ে দীর্ঘমেয়াদী প্রবৃদ্ধির Steady State নির্ধারণ।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">📊 Growth Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Saving Rate (s)</span><span class="ctrl-val" id="sg-s-val">0.30</span></div><input type="range" min="5" max="60" value="30" id="sg-s" oninput="growthUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Population Growth Rate (n)</span><span class="ctrl-val" id="sg-n-val">0.02</span></div><input type="range" min="0" max="50" value="2" id="sg-n" oninput="growthUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Technology Level (A)</span><span class="ctrl-val" id="sg-a-val">1.0</span></div><input type="range" min="5" max="30" value="10" id="sg-a" oninput="growthUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Depreciation Rate (δ)</span><span class="ctrl-val" id="sg-d-val">0.05</span></div><input type="range" min="2" max="15" value="5" id="sg-d" oninput="growthUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Steady-State Capital k*</div><div class="metric-val" id="sg-k">—</div></div>
+          <div class="metric"><div class="metric-label">Output per Worker y*</div><div class="metric-val" id="sg-y">—</div></div>
+          <div class="metric"><div class="metric-label">GDP Growth Rate</div><div class="metric-val" id="sg-g">—</div></div>
+          <div class="metric"><div class="metric-label">Capital Stock</div><div class="metric-val" id="sg-cap">—</div></div>
+        </div>
+        <div class="explain" id="sg-explain">Saving rate বাড়ালে steady state capital বাড়ে।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Production Function, Savings & Break-Even Investment</div>
+        <div class="chart-container"><canvas id="growthChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> f(k) — Output per Worker</div>
+          <div class="leg"><div class="leg-line" style="background:#34D399"></div> s·f(k) — Actual Savings</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> (n+δ)·k — Break-even</div>
+          <div class="leg"><div class="leg-dot" style="background:#F472B6"></div> Steady State (k*)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 9: MARKET STRUCTURE -->
+<div id="page-market" class="page">
+  <div class="module-title">📦 Market Structure Simulator</div>
+  <div class="module-desc">Perfect Competition, Monopoly ও Oligopoly তুলনা। মূল্য, আউটপুট, মুনাফা ও ভোক্তা উদ্বৃত্তে পার্থক্য দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">📦 Market Type</div>
+        <div class="sel-group">
+          <button class="sel-btn active" id="ms-pc" onclick="setMarket('pc')">Perfect Competition</button>
+          <button class="sel-btn" id="ms-mono" onclick="setMarket('mono')">Monopoly</button>
+          <button class="sel-btn" id="ms-olig" onclick="setMarket('olig')">Oligopoly</button>
+        </div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Marginal Cost (MC)</span><span class="ctrl-val" id="ms-mc-val">30</span></div><input type="range" min="5" max="80" value="30" id="ms-mc" oninput="marketUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Number of Firms</span><span class="ctrl-val" id="ms-firms-val">1</span></div><input type="range" min="1" max="20" value="1" id="ms-firms" oninput="marketUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Outcome</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Profit</div><div class="metric-val" id="ms-profit">—</div></div>
+          <div class="metric"><div class="metric-label">Output (Q)</div><div class="metric-val" id="ms-output">—</div></div>
+          <div class="metric"><div class="metric-label">Consumer Surplus</div><div class="metric-val" id="ms-cs">—</div></div>
+          <div class="metric"><div class="metric-label">Deadweight Loss</div><div class="metric-val" id="ms-dwl">—</div></div>
+        </div>
+        <div class="explain" id="ms-explain">Monopoly সর্বোচ্চ মুনাফা করে কিন্তু society-র জন্য অদক্ষ।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Demand, Marginal Cost & Revenue Curves</div>
+        <div class="chart-container"><canvas id="marketChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Demand (AR)</div>
+          <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> Marginal Cost (MC)</div>
+          <div class="leg"><div class="leg-line" style="background:#8A94B2"></div> MR Curve</div>
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Equilibrium</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 10: FISCAL -->
+<div id="page-fiscal" class="page">
+  <div class="module-title">🎯 Fiscal Policy Budget Simulator</div>
+  <div class="module-desc">সরকারি বাজেট তৈরি করুন। দেখুন কর, ব্যয় ও ভর্তুকি কীভাবে GDP, মুদ্রাস্ফীতি ও ঋণকে প্রভাবিত করে।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">💵 Revenue Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Tax Rate (%)</span><span class="ctrl-val" id="fp-tax-val">15</span></div><input type="range" min="0" max="50" value="15" id="fp-tax" oninput="fiscalUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Non-Tax Revenue</span><span class="ctrl-val" id="fp-ntr-val">30</span></div><input type="range" min="0" max="100" value="30" id="fp-ntr" oninput="fiscalUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">💸 Expenditure Controls</div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Government Spending (G)</span><span class="ctrl-val" id="fp-g-val">60</span></div><input type="range" min="10" max="150" value="60" id="fp-g" oninput="fiscalUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Subsidy</span><span class="ctrl-val" id="fp-sub-val">20</span></div><input type="range" min="0" max="80" value="20" id="fp-sub" oninput="fiscalUpdate()"></div>
+        <div class="ctrl"><div class="ctrl-top"><span class="ctrl-label">Welfare Spending</span><span class="ctrl-val" id="fp-wel-val">20</span></div><input type="range" min="0" max="80" value="20" id="fp-wel" oninput="fiscalUpdate()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Fiscal Result</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Budget Balance</div><div class="metric-val" id="fp-bal">—</div><div class="metric-change" id="fp-balch"></div></div>
+          <div class="metric"><div class="metric-label">GDP Growth</div><div class="metric-val" id="fp-gdp">—</div></div>
+          <div class="metric"><div class="metric-label">Inflation</div><div class="metric-val" id="fp-inf">—</div></div>
+          <div class="metric"><div class="metric-label">Public Debt Risk</div><div class="metric-val" id="fp-debt">—</div></div>
+        </div>
+        <div class="explain" id="fp-explain">বাজেট ঘাটতি থাকলে সরকারকে ঋণ নিতে হয়।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Revenue vs Expenditure — Budget Breakdown</div>
+        <div class="chart-container"><canvas id="fiscalChart"></canvas></div>
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Revenue Items</div>
+          <div class="leg"><div class="leg-dot" style="background:#F87171"></div> Expenditure Items</div>
+          <div class="leg"><div class="leg-dot" style="background:#4F8EF7"></div> Budget Balance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// NAVIGATION
+const inited = {};
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector('.nav-btn[onclick="showPage(\''+id+'\')"]').classList.add('active');
+  const map = {islm:islmInit,adas:adasInit,money:moneyInit,labor:laborInit,trade:tradeInit,phillips:phillipsInit,banking:bankingInit,growth:growthInit,market:marketInit,fiscal:fiscalInit};
+  if (map[id] && !inited[id]) { inited[id]=1; map[id](); }
+}
+
+// CHART FACTORY
+function mkChart(id, xl, yl, xMax, yMax) {
+  return new Chart(document.getElementById(id), {
+    type:'scatter', data:{datasets:[]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{title:{display:true,text:xl,font:{size:11},color:'#8A94B2'},min:0,max:xMax,grid:{color:'rgba(42,48,80,.8)'},ticks:{color:'#8A94B2',font:{size:10}}},
+        y:{title:{display:true,text:yl,font:{size:11},color:'#8A94B2'},min:0,max:yMax,grid:{color:'rgba(42,48,80,.8)'},ticks:{color:'#8A94B2',font:{size:10}}}
+      }
+    }
+  });
+}
+
+function v(id){return +document.getElementById(id).value;}
+function sv(id,val){document.getElementById(id).textContent=val;}
+let pv={islmY:null,islmR:null,adP:null,adY:null,fpBal:null};
+function chg(prev,curr,unit=''){
+  if(prev===null)return'';
+  const d=curr-prev;
+  if(Math.abs(d)<0.05)return'<span class="neu">—</span>';
+  return`<span class="${d>0?'up':'down'}">${d>0?'↑ +':'↓ '}${Math.abs(d).toFixed(1)}${unit}</span>`;
+}
+
+// ── MODULE 1: IS-LM ──
+let islmC;
+function islmInit(){islmC=mkChart('islmChart','National Income (Y)','Interest Rate r%',200,18);islmUpdate();}
+function islmUpdate(){
+  if(!islmC)return;
+  const G=v('islm-g'),T=v('islm-t'),M=v('islm-m'),mpc=v('islm-mpc')/100,inv=v('islm-inv');
+  sv('islm-g-val',G);sv('islm-t-val',T);sv('islm-m-val',M);sv('islm-mpc-val',mpc.toFixed(2));sv('islm-inv-val',inv);
+  const mult=1/(1-mpc);
+  const isD=[],lmD=[];
+  for(let r=.3;r<=17;r+=.3){const y=mult*(G-mpc*T+80-inv*r);if(y>=0&&y<=200)isD.push({x:+y.toFixed(1),y:+r.toFixed(1)});}
+  for(let y=5;y<=195;y+=3){const r=(M/10-.5*y)/-2;if(r>=0&&r<=18)lmD.push({x:+y.toFixed(1),y:+r.toFixed(1)});}
+  let lo=0,hi=17;
+  for(let i=0;i<100;i++){const mid=(lo+hi)/2;const yis=mult*(G-mpc*T+80-inv*mid);const rlm=(M/10-.5*yis)/-2;if(rlm>mid)lo=mid;else hi=mid;}
+  const eqR=+((lo+hi)/2).toFixed(1);
+  const eqY=+(mult*(G-mpc*T+80-inv*eqR)).toFixed(1);
+  const eqI=+(80-inv*eqR).toFixed(1);
+  const eqC=+(mpc*(eqY-T)+20).toFixed(1);
+  sv('islm-Y',eqY);sv('islm-R',eqR+'%');sv('islm-I',eqI);sv('islm-C',eqC);
+  document.getElementById('islm-Ych').innerHTML=chg(pv.islmY,eqY);
+  document.getElementById('islm-Rch').innerHTML=chg(pv.islmR,eqR,'%');
+  pv.islmY=eqY;pv.islmR=eqR;
+  islmC.data.datasets=[
+    {data:isD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:lmD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:[{x:eqY,y:eqR}],pointRadius:8,pointBackgroundColor:'#34D399',borderColor:'#34D399',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  islmC.update('none');
+  let e=`ভারসাম্য: Y* = ${eqY}, r* = ${eqR}%. `;
+  if(G>70)e+='<strong>Expansionary Fiscal Policy</strong> — IS ডানে → আয় বাড়ে।';
+  else if(G<30)e+='<strong>Contractionary Fiscal Policy</strong> — IS বামে → আয় কমে।';
+  if(M>150)e+=' <strong>Easy Money</strong> — LM নিচে → সুদের হার কমে।';
+  else if(M<70)e+=' <strong>Tight Money</strong> — LM উপরে → সুদের হার বাড়ে।';
+  document.getElementById('islm-explain').innerHTML=e;
+}
+
+// ── MODULE 2: AD-AS ──
+let adasC;
+function adasInit(){adasC=mkChart('adasChart','Real Output (Y)','Price Level (P)',200,18);adasUpdate();}
+function adasUpdate(){
+  if(!adasC)return;
+  const cc=v('ad-cc'),G=v('ad-g'),M=v('ad-m'),X=v('ad-x');
+  const wage=v('as-w'),oil=v('as-o'),tech=v('as-tech'),prod=v('as-prod');
+  sv('ad-cc-val',cc);sv('ad-g-val',G);sv('ad-m-val',M);sv('ad-x-val',X);
+  sv('as-w-val',wage);sv('as-o-val',oil);sv('as-tech-val',tech);sv('as-prod-val',prod);
+  const adShift=(cc+G+X)*.5+M*.2;
+  const asShift=(wage+oil)*.1-(tech+prod)*.08;
+  const adD=[],srasD=[],lrasD=[];
+  for(let P=.3;P<=17;P+=.3){const y=adShift-P*3;if(y>=0&&y<=200)adD.push({x:+y.toFixed(1),y:+P.toFixed(1)});}
+  for(let y=5;y<=195;y+=3){const p=3+asShift+y*.04;if(p>=0&&p<=18)srasD.push({x:+y.toFixed(1),y:+p.toFixed(1)});}
+  for(let p=0;p<=18;p+=.5)lrasD.push({x:120,y:p});
+  let lo=0,hi=17;
+  for(let i=0;i<100;i++){const mid=(lo+hi)/2;const yad=adShift-mid*3;const pas=3+asShift+yad*.04;if(pas<mid)hi=mid;else lo=mid;}
+  const eqP=+((lo+hi)/2).toFixed(1);
+  const eqY=+(adShift-eqP*3).toFixed(1);
+  sv('ad-P',eqP);sv('ad-Y',eqY);sv('ad-inf',(eqP*2).toFixed(1)+'%');sv('ad-unemp',Math.max(2,10-eqY/20).toFixed(1)+'%');
+  document.getElementById('ad-Pch').innerHTML=chg(pv.adP,eqP);
+  document.getElementById('ad-Ych').innerHTML=chg(pv.adY,eqY);
+  pv.adP=eqP;pv.adY=eqY;
+  adasC.data.datasets=[
+    {data:adD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:srasD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:lrasD,showLine:true,borderColor:'#F472B6',backgroundColor:'transparent',pointRadius:0,borderWidth:1.5,borderDash:[5,3]},
+    {data:[{x:eqY,y:eqP}],pointRadius:8,pointBackgroundColor:'#34D399',borderColor:'#34D399',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  adasC.update('none');
+  let e=`ভারসাম্য: Y* = ${eqY}, P* = ${eqP}. `;
+  if(wage>70||oil>70)e+='<strong>Supply Shock!</strong> SRAS বামে → Stagflation সম্ভব।';
+  else if(G>70)e+='<strong>Fiscal Stimulus</strong> — AD ডানে → Output ও Price উভয়ই বাড়ে।';
+  document.getElementById('adas-explain').innerHTML=e;
+}
+
+// ── MODULE 3: MONEY MARKET ──
+let moneyC;
+function moneyInit(){moneyC=mkChart('moneyChart','Money Quantity','Interest Rate r%',200,18);moneyUpdate();}
+function moneyUpdate(){
+  if(!moneyC)return;
+  const ms=v('mm-ms'),md=v('mm-md'),cbr=v('mm-cbr');
+  sv('mm-ms-val',ms);sv('mm-md-val',md);sv('mm-cbr-val',cbr);
+  const msD=[],mdD=[],cbrD=[];
+  for(let r=0;r<=18;r+=.5)msD.push({x:ms,y:r});
+  for(let r=.3;r<=17;r+=.3){const q=md*1.5+20-r*6;if(q>=0&&q<=200)mdD.push({x:+q.toFixed(1),y:+r.toFixed(1)});}
+  for(let q=0;q<=200;q+=5)cbrD.push({x:q,y:cbr});
+  const eqR=+Math.max(.5,(md*1.5+20-ms)/6).toFixed(1);
+  sv('mm-ir',eqR+'%');
+  sv('mm-liq',ms>130?'উচ্চ':ms>80?'মধ্যম':'নিম্ন');
+  sv('mm-cred',ms>130?'সহজলভ্য':ms>80?'মাঝারি':'সীমিত');
+  sv('mm-sig',eqR<cbr?'📉 Easy Money':eqR>cbr?'📈 Tight Money':'⚖️ Neutral');
+  moneyC.data.datasets=[
+    {data:msD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2.5},
+    {data:mdD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:cbrD,showLine:true,borderColor:'#F472B6',backgroundColor:'transparent',pointRadius:0,borderWidth:1.5,borderDash:[5,3]},
+    {data:[{x:ms,y:eqR}],pointRadius:8,pointBackgroundColor:'#34D399',borderColor:'#34D399',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  moneyC.update('none');
+  let e=`ভারসাম্য সুদের হার: ${eqR}%. `;
+  if(ms>150)e+='<strong>Money Supply বেশি</strong> — সুদের হার কমে, বিনিয়োগ বাড়ে।';
+  else if(ms<70)e+='<strong>Tight Monetary Policy</strong> — সুদের হার বেশি, মুদ্রাস্ফীতি নিয়ন্ত্রণে।';
+  document.getElementById('mm-explain').innerHTML=e;
+}
+
+// ── MODULE 4: LABOR ──
+let laborC;
+function laborInit(){laborC=mkChart('laborChart','Employment (L)','Wage (W)',150,110);laborUpdate();}
+function laborUpdate(){
+  if(!laborC)return;
+  const mw=v('lab-mw'),ld=v('lab-ld'),tech=v('lab-tech'),pop=v('lab-pop');
+  sv('lab-mw-val',mw);sv('lab-ld-val',ld);sv('lab-tech-val',tech);sv('lab-pop-val',pop);
+  const ldD=[],lsD=[],mwD=[];
+  for(let w=5;w<=105;w+=3){const l=ld*1.2-tech*.3-w*.8+40;if(l>=0&&l<=150)ldD.push({x:+l.toFixed(1),y:+w.toFixed(1)});}
+  for(let w=5;w<=105;w+=3){const l=pop*.8+w*.6-20;if(l>=0&&l<=150)lsD.push({x:+l.toFixed(1),y:+w.toFixed(1)});}
+  for(let l=0;l<=150;l+=5)mwD.push({x:l,y:mw});
+  let eqW=0,eqL=0;
+  for(let w=5;w<=105;w+=.1){const ldv=ld*1.2-tech*.3-w*.8+40;const lsv=pop*.8+w*.6-20;if(Math.abs(ldv-lsv)<1){eqW=w;eqL=(ldv+lsv)/2;break;}}
+  const effW=Math.max(mw,eqW);
+  const ldMW=ld*1.2-tech*.3-effW*.8+40;const lsMW=pop*.8+effW*.6-20;
+  const emp=+Math.max(0,ldMW).toFixed(0);
+  const unemp=+Math.max(0,((lsMW-ldMW)/Math.max(1,lsMW))*100).toFixed(1);
+  sv('lab-emp',emp);sv('lab-unemp',unemp+'%');sv('lab-wage',effW.toFixed(0));
+  sv('lab-surplus',lsMW>ldMW+2?'Labor Surplus':lsMW<ldMW-2?'Labor Shortage':'Balanced');
+  laborC.data.datasets=[
+    {data:ldD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:lsD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:mwD,showLine:true,borderColor:'#F472B6',backgroundColor:'transparent',pointRadius:0,borderWidth:1.5,borderDash:[5,3]},
+    {data:[{x:eqL,y:eqW}],pointRadius:8,pointBackgroundColor:'#34D399',borderColor:'#34D399',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  laborC.update('none');
+  let e=`Employment: ${emp}, Unemployment: ${unemp}%. `;
+  if(mw>eqW+5)e+='<strong>Minimum wage বাজারের উপরে</strong> — Labor surplus, বেকারত্ব বাড়ে।';
+  else if(tech>70)e+='<strong>Automation বাড়ছে</strong> — Labor demand কমে।';
+  else e+='বাজার ভারসাম্যে। Controls পরিবর্তন করুন।';
+  document.getElementById('lab-explain').innerHTML=e;
+}
+
+// ── MODULE 5: TRADE ──
+let tradeC;
+function tradeInit(){tradeC=mkChart('tradeChart','Exchange Rate (BDT/USD)','Trade Value',160,160);tradeUpdate();}
+function tradeUpdate(){
+  if(!tradeC)return;
+  const ex=v('tr-ex'),tar=v('tr-tar'),ir=v('tr-imp'),fi=v('tr-fi');
+  sv('tr-ex-val',ex);sv('tr-tar-val',tar);sv('tr-imp-val',ir);sv('tr-fi-val',fi);
+  const expV=+(fi*.8+(ex-90)*.6+20).toFixed(0);
+  const impV=+(120-ir*.4-tar*.5+(160-ex)*.3).toFixed(0);
+  const bal=expV-impV;
+  sv('tr-exp',expV);sv('tr-imp2',impV);
+  document.getElementById('tr-bal').textContent=(bal>=0?'+':'')+bal;
+  document.getElementById('tr-bal').className='metric-val '+(bal>=0?'up':'down');
+  sv('tr-cur',ex>120?'BDT দুর্বল — রপ্তানি সুবিধা':ex<100?'BDT শক্তিশালী — আমদানি সস্তা':'মাঝামাঝি');
+  const expD=[],impD=[];
+  for(let r=80;r<=155;r+=3){
+    expD.push({x:r,y:+(fi*.8+(r-90)*.6+20).toFixed(1)});
+    impD.push({x:r,y:+Math.max(0,120-ir*.4-tar*.5+(160-r)*.3).toFixed(1)});
+  }
+  tradeC.data.datasets=[
+    {data:expD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:impD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.3},
+    {data:[{x:ex,y:expV},{x:ex,y:impV}],pointRadius:7,pointBackgroundColor:'#34D399',borderColor:'transparent'}
+  ];
+  tradeC.update('none');
+  let e=`Exports: ${expV}, Imports: ${impV}, Balance: ${bal>=0?'+':''}${bal}. `;
+  if(bal<-20)e+='<strong>Trade Deficit</strong> — আমদানি বেশি, বৈদেশিক মুদ্রা হারাচ্ছে।';
+  else if(bal>20)e+='<strong>Trade Surplus</strong> — রপ্তানি ভালো, রিজার্ভ বাড়ছে।';
+  document.getElementById('tr-explain').innerHTML=e;
+}
+
+// ── MODULE 6: PHILLIPS ──
+let phillipsC;
+function phillipsInit(){phillipsC=mkChart('phillipsChart','Unemployment (%)','Inflation (%)',15,18);phillipsUpdate();}
+function phillipsUpdate(){
+  if(!phillipsC)return;
+  const exp=v('ph-exp'),ad=v('ph-ad'),ss=v('ph-ss');
+  sv('ph-exp-val',exp);sv('ph-ad-val',ad);sv('ph-ss-val',ss);
+  const nairu=5;
+  const srD=[],srED=[],lrD=[];
+  for(let u=1;u<=14;u+=.3){
+    srD.push({x:+u.toFixed(1),y:+Math.max(0,exp+.5*(nairu-u)*(ad/50)+ss*.2).toFixed(1)});
+    srED.push({x:+u.toFixed(1),y:+Math.max(0,exp+.5*(nairu-u)*(ad/50)).toFixed(1)});
+  }
+  for(let p=0;p<=17;p++)lrD.push({x:nairu,y:p});
+  const cu=+(nairu-(ad-50)*.06).toFixed(1);
+  const ci=+(exp+.5*(nairu-cu)*(ad/50)+ss*.2).toFixed(1);
+  sv('ph-inf',ci+'%');sv('ph-unemp',cu+'%');
+  sv('ph-stag',ss>15&&ci>5?'⚠️ High Risk':ss>5?'🟡 Moderate':'🟢 Low');
+  phillipsC.data.datasets=[
+    {data:srD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.4},
+    {data:srED,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:1.5,borderDash:[4,3],tension:.4},
+    {data:lrD,showLine:true,borderColor:'#F472B6',backgroundColor:'transparent',pointRadius:0,borderWidth:1.5,borderDash:[6,3]},
+    {data:[{x:cu,y:ci}],pointRadius:8,pointBackgroundColor:'#34D399',borderColor:'#34D399',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  phillipsC.update('none');
+  let e=`Inflation: ${ci}%, Unemployment: ${cu}%. `;
+  if(ss>15)e+='<strong>Supply Shock Stagflation!</strong> মুদ্রাস্ফীতি ও বেকারত্ব একসাথে বাড়ছে।';
+  else if(ad>70)e+='<strong>High Demand</strong> — বেকারত্ব কম কিন্তু মুদ্রাস্ফীতির চাপ।';
+  document.getElementById('ph-explain').innerHTML=e;
+}
+
+// ── MODULE 7: BANKING ──
+let bankingC;
+function bankingInit(){
+  bankingC=new Chart(document.getElementById('bankingChart'),{
+    type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:'#4F8EF7',label:'Loans'},{data:[],backgroundColor:'#F59E0B',label:'Reserves'}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{display:false}},
+      scales:{x:{stacked:true,grid:{color:'rgba(42,48,80,.8)'},ticks:{color:'#8A94B2',font:{size:9}}},y:{stacked:true,grid:{color:'rgba(42,48,80,.8)'},ticks:{color:'#8A94B2',font:{size:10}}}}}
+  });
+  bankingUpdate();
+}
+function bankingUpdate(){
+  if(!bankingC)return;
+  const rr=v('bk-rr')/100,ir=v('bk-ir'),lb=v('bk-lb')/100,dep=v('bk-dep');
+  sv('bk-rr-val',(rr*100).toFixed(0));sv('bk-ir-val',ir);sv('bk-lb-val',(lb*100).toFixed(0));sv('bk-dep-val',dep);
+  const mult=+(1/rr).toFixed(2);
+  const total=+(dep*mult*lb).toFixed(0);
+  sv('bk-mult','×'+mult);sv('bk-cred',(total-dep).toLocaleString());sv('bk-total',total.toLocaleString());
+  sv('bk-risk',rr<.05?'🔴 High':rr<.1?'🟡 Moderate':'🟢 Low');
+  const labels=[],loans=[],reserves=[];
+  let amt=dep;
+  for(let i=1;i<=7;i++){labels.push('R'+i);loans.push(+(amt*(1-rr)).toFixed(0));reserves.push(+(amt*rr).toFixed(0));amt=amt*(1-rr);}
+  bankingC.data.labels=labels;bankingC.data.datasets[0].data=loans;bankingC.data.datasets[1].data=reserves;
+  bankingC.update('none');
+  document.getElementById('bk-explain').innerHTML=`Money Multiplier = 1/${(rr*100).toFixed(0)}% = ${mult}×. Total created: ৳${total.toLocaleString()}. ${rr<.05?'<strong>খুব কম reserve</strong> — বেশি ঋণ, তবে ঝুঁকিও বেশি।':''}`;
+}
+
+// ── MODULE 8: GROWTH ──
+let growthC;
+function growthInit(){growthC=mkChart('growthChart','Capital per Worker (k)','Output per Worker (y)',100,28);growthUpdate();}
+function growthUpdate(){
+  if(!growthC)return;
+  const s=v('sg-s')/100,n=v('sg-n')/100,A=v('sg-a')/10,d=v('sg-d')/100;
+  sv('sg-s-val',s.toFixed(2));sv('sg-n-val',n.toFixed(2));sv('sg-a-val',A.toFixed(1));sv('sg-d-val',d.toFixed(2));
+  const fD=[],sfD=[],bkD=[];
+  for(let k=1;k<=98;k++){const y=A*Math.pow(k,.5);fD.push({x:k,y:+Math.min(27,y).toFixed(2)});sfD.push({x:k,y:+Math.min(27,s*y).toFixed(2)});bkD.push({x:k,y:+Math.min(27,(n+d)*k).toFixed(2)});}
+  let kstar=0;
+  for(let k=1;k<=98;k+=.1){if(Math.abs(s*A*Math.pow(k,.5)-(n+d)*k)<.05){kstar=k;break;}}
+  const ystar=+(A*Math.pow(kstar,.5)).toFixed(2);
+  sv('sg-k',kstar.toFixed(1));sv('sg-y',ystar);sv('sg-g',(n*100).toFixed(1)+'%');sv('sg-cap',(kstar*100).toFixed(0));
+  growthC.data.datasets=[
+    {data:fD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.2},
+    {data:sfD,showLine:true,borderColor:'#34D399',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.2},
+    {data:bkD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.2},
+    {data:[{x:kstar,y:s*A*Math.pow(kstar,.5)}],pointRadius:8,pointBackgroundColor:'#F472B6',borderColor:'#F472B6',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  growthC.update('none');
+  let e=`Steady State: k* = ${kstar.toFixed(1)}, y* = ${ystar}. `;
+  if(s>.4)e+='<strong>উচ্চ সঞ্চয়</strong> — বেশি বিনিয়োগ, k* বাড়ে।';
+  if(n>.03)e+=' <strong>দ্রুত জনসংখ্যা বৃদ্ধি</strong> — break-even বেশি, k* কমে।';
+  if(A>1.5)e+=' <strong>উচ্চ Technology</strong> — দীর্ঘমেয়াদী প্রবৃদ্ধি।';
+  document.getElementById('sg-explain').innerHTML=e;
+}
+
+// ── MODULE 9: MARKET ──
+let marketC,curMkt='pc';
+function setMarket(t){
+  curMkt=t;
+  ['pc','mono','olig'].forEach(x=>document.getElementById('ms-'+x).classList.remove('active'));
+  document.getElementById('ms-'+t).classList.add('active');
+  document.getElementById('ms-firms').value=t==='pc'?20:t==='mono'?1:4;
+  sv('ms-firms-val',document.getElementById('ms-firms').value);
+  marketUpdate();
+}
+function marketInit(){marketC=mkChart('marketChart','Quantity (Q)','Price / Cost',110,100);marketUpdate();}
+function marketUpdate(){
+  if(!marketC)return;
+  const mc=v('ms-mc'),firms=v('ms-firms');
+  sv('ms-mc-val',mc);sv('ms-firms-val',firms);
+  const demD=[],mcD=[],mrD=[];
+  for(let q=0;q<=105;q+=2){demD.push({x:q,y:Math.max(0,100-q*.7)});mcD.push({x:q,y:mc});mrD.push({x:q,y:Math.max(0,100-q*1.4)});}
+  let eqQ,eqP,profit,cs,dwl;
+  if(curMkt==='pc'){eqP=mc;eqQ=+((100-mc)/.7).toFixed(0);profit=0;cs=+((100-mc)*eqQ/2).toFixed(0);dwl=0;}
+  else if(curMkt==='mono'){eqQ=+((100-mc)/1.4).toFixed(0);eqP=+(100-eqQ*.7).toFixed(1);profit=+((eqP-mc)*eqQ).toFixed(0);cs=+((100-eqP)*eqQ/2).toFixed(0);dwl=+((eqP-mc)*((100-mc)/.7-eqQ)/2).toFixed(0);}
+  else{eqQ=+((100-mc)/(.7+1.4/firms)).toFixed(0);eqP=+(100-eqQ*.7).toFixed(1);profit=+((eqP-mc)*eqQ/firms).toFixed(0);cs=+((100-eqP)*eqQ/2).toFixed(0);dwl=+Math.max(0,(eqP-mc)*((100-mc)/.7-eqQ)/2).toFixed(0);}
+  sv('ms-profit',profit.toLocaleString());sv('ms-output',eqQ);sv('ms-cs',cs.toLocaleString());sv('ms-dwl',dwl.toLocaleString());
+  const eqPt=curMkt==='pc'?mc:+eqP;
+  marketC.data.datasets=[
+    {data:demD,showLine:true,borderColor:'#4F8EF7',backgroundColor:'transparent',pointRadius:0,borderWidth:2},
+    {data:mcD,showLine:true,borderColor:'#F59E0B',backgroundColor:'transparent',pointRadius:0,borderWidth:2},
+    {data:mrD,showLine:true,borderColor:'#8A94B2',backgroundColor:'transparent',pointRadius:0,borderWidth:1.5,borderDash:[5,3]},
+    {data:[{x:eqQ,y:eqPt}],pointRadius:8,pointBackgroundColor:'#34D399',borderColor:'#34D399',pointBorderColor:'#fff',pointBorderWidth:2}
+  ];
+  marketC.update('none');
+  const nm={pc:'Perfect Competition',mono:'Monopoly',olig:'Oligopoly'};
+  let e=`<strong>${nm[curMkt]}</strong>: Q = ${eqQ}, P = ${eqPt}. `;
+  if(curMkt==='mono')e+='MR = MC তে output — ভোক্তা উদ্বৃত্ত কম, deadweight loss বেশি।';
+  else if(curMkt==='pc')e+='P = MC — সর্বোচ্চ দক্ষতা, deadweight loss শূন্য।';
+  else e+=`${firms}টি ফার্ম — monopoly ও competition-এর মাঝামাঝি।`;
+  document.getElementById('ms-explain').innerHTML=e;
+}
+
+// ── MODULE 10: FISCAL ──
+let fiscalC;
+function fiscalInit(){
+  fiscalC=new Chart(document.getElementById('fiscalChart'),{
+    type:'bar',
+    data:{labels:['Tax Revenue','Non-Tax Rev','Total Revenue','Gov Spending','Subsidy','Welfare','Total Exp','Budget Balance'],datasets:[{data:[],backgroundColor:[]}]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'rgba(42,48,80,.8)'},ticks:{color:'#8A94B2',font:{size:8}}},y:{grid:{color:'rgba(42,48,80,.8)'},ticks:{color:'#8A94B2',font:{size:10}}}}}
+  });
+  fiscalUpdate();
+}
+function fiscalUpdate(){
+  if(!fiscalC)return;
+  const tax=v('fp-tax'),ntr=v('fp-ntr'),G=v('fp-g'),sub=v('fp-sub'),wel=v('fp-wel');
+  sv('fp-tax-val',tax);sv('fp-ntr-val',ntr);sv('fp-g-val',G);sv('fp-sub-val',sub);sv('fp-wel-val',wel);
+  const taxR=tax*5,totalR=taxR+ntr,totalE=G+sub+wel,bal=totalR-totalE;
+  const gdpG=+((G*.05)+(tax<20?1:0)-(sub+wel)*.01).toFixed(1);
+  const inf=+((G+sub)*.05).toFixed(1);
+  document.getElementById('fp-bal').textContent=(bal>=0?'+':'')+bal;
+  document.getElementById('fp-bal').className='metric-val '+(bal>=0?'up':'down');
+  document.getElementById('fp-balch').innerHTML=chg(pv.fpBal,bal);
+  pv.fpBal=bal;
+  sv('fp-gdp',gdpG+'%');sv('fp-inf',inf+'%');
+  sv('fp-debt',bal<-20?'🔴 High':bal<0?'🟡 Moderate':'🟢 Low');
+  const vals=[taxR,ntr,totalR,G,sub,wel,totalE,bal];
+  const cols=vals.map((x,i)=>i===7?(x>=0?'#34D399':'#F87171'):i>=3&&i<=6?'#F87171':'#4F8EF7');
+  fiscalC.data.datasets[0].data=vals;fiscalC.data.datasets[0].backgroundColor=cols;
+  fiscalC.update('none');
+  let e=`Revenue: ${totalR}, Expenditure: ${totalE}. `;
+  if(bal<-20)e+='<strong>বড় বাজেট ঘাটতি</strong> — সরকারকে ঋণ নিতে হবে। ভবিষ্যতে সুদের বোঝা বাড়বে।';
+  else if(bal>20)e+='<strong>Budget Surplus</strong> — ঋণ শোধের সুযোগ।';
+  else e+='বাজেট প্রায় ভারসাম্যে।';
+  document.getElementById('fp-explain').innerHTML=e;
+}
+</script>
+</body>
+</html>
+
+<!-- ══════════════════════════════════════════════════════
+  UPGRADE PACK — 6 New Modules + Graph Features
+  Appended to existing EconLab BD platform
+══════════════════════════════════════════════════════ -->
+<style>
+/* Extra nav highlight for new modules */
+.nav-btn.new-mod { border-left: 2px solid var(--accent3); }
+.badge-new { font-size: 9px; background: var(--accent3); color: #000; padding: 1px 5px; border-radius: 10px; font-weight: 700; vertical-align: middle; }
+/* Typed input row */
+.input-row { display: flex; gap: 6px; align-items: center; }
+.input-row input[type=range] { flex: 1; }
+.typed-input {
+  width: 58px; background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); border-radius: var(--radius-sm); padding: 3px 6px;
+  font-size: 12px; font-family: var(--font); text-align: center;
+}
+.typed-input:focus { outline: none; border-color: var(--accent); }
+/* Export button */
+.export-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(79,142,247,.12); border: 1px solid rgba(79,142,247,.3);
+  color: var(--accent); border-radius: var(--radius-sm);
+  padding: 5px 12px; font-size: 11px; cursor: pointer;
+  font-family: var(--font); transition: all .2s; margin-top: 8px;
+}
+.export-btn:hover { background: rgba(79,142,247,.2); }
+/* regime toggle */
+.regime-row { display: flex; gap: 6px; margin-bottom: 12px; }
+.regime-btn { flex: 1; padding: 6px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: none; color: var(--muted); cursor: pointer; font-size: 12px; font-family: var(--font); transition: all .2s; }
+.regime-btn.active { background: rgba(79,142,247,.15); border-color: var(--accent); color: var(--accent); }
+</style>
+
+<!-- Inject new nav buttons via script (after DOM loads) -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.querySelector('.nav');
+  const newBtns = [
+    ['bc','🔄 Business Cycle'],
+    ['stock','💹 Asset Bubble'],
+    ['kc','🏗️ Keynesian Cross'],
+    ['mf','🌐 Mundell-Fleming'],
+    ['cp','📐 Cost & Production'],
+    ['env','🌱 Carbon Tax'],
+  ];
+  newBtns.forEach(([id, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn new-mod';
+    btn.setAttribute('onclick', `showPage('${id}')`);
+    btn.innerHTML = `${label} <span class="badge-new">NEW</span>`;
+    nav.appendChild(btn);
+  });
+});
+</script>
+
+<!-- ═══ MODULE 11: BUSINESS CYCLE ═══ -->
+<div id="page-bc" class="page">
+  <div class="module-title">🔄 Business Cycle Simulator</div>
+  <div class="module-desc">অর্থনৈতিক চক্রের Expansion, Peak, Recession ও Trough ধাপ। Policy intervention-এর প্রভাব রিয়েলটাইমে দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🔄 Cycle Controls</div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Initial Shock (negative = recession)</span><span class="ctrl-val" id="bc-shock-val">-8</span></div>
+          <div class="input-row"><input type="range" min="-20" max="20" value="-8" id="bc-shock" oninput="bcUpdate()"><input type="text" class="typed-input" id="bc-shock-t" value="-8"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Policy Response Strength</span><span class="ctrl-val" id="bc-policy-val">5</span></div>
+          <div class="input-row"><input type="range" min="0" max="20" value="5" id="bc-policy" oninput="bcUpdate()"><input type="text" class="typed-input" id="bc-policy-t" value="5"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Cycle Duration (quarters)</span><span class="ctrl-val" id="bc-dur-val">16</span></div>
+          <div class="input-row"><input type="range" min="8" max="32" value="16" id="bc-dur" oninput="bcUpdate()"><input type="text" class="typed-input" id="bc-dur-t" value="16"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Cycle Metrics</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Current Phase</div><div class="metric-val" id="bc-phase" style="font-size:13px">—</div></div>
+          <div class="metric"><div class="metric-label">Output Gap</div><div class="metric-val" id="bc-gap">—</div></div>
+          <div class="metric"><div class="metric-label">Peak GDP</div><div class="metric-val" id="bc-peak">—</div></div>
+          <div class="metric"><div class="metric-label">Trough GDP</div><div class="metric-val" id="bc-trough">—</div></div>
+        </div>
+        <div class="explain" id="bc-explain">Shock ও Policy sliders পরিবর্তন করে cycle দেখুন।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Business Cycle — GDP, Unemployment & Inflation Over Time</div>
+        <div class="chart-container"><canvas id="bcChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <div class="legend">
+            <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Real GDP</div>
+            <div class="leg"><div class="leg-line" style="background:#34D399;height:0;border-top:2px dashed #34D399;background:none"></div> Trend GDP</div>
+            <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> Unemployment %</div>
+            <div class="leg"><div class="leg-line" style="background:#F472B6"></div> Inflation %</div>
+          </div>
+          <button class="export-btn" onclick="exportChart('bcChart','business-cycle')">⬇ Export PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODULE 12: STOCK MARKET / ASSET BUBBLE ═══ -->
+<div id="page-stock" class="page">
+  <div class="module-title">💹 Stock Market & Asset Bubble Simulator</div>
+  <div class="module-desc">Irrational exuberance, interest rate ও earnings দিয়ে asset bubble কীভাবে তৈরি হয় ও ফাটে দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">💹 Market Controls</div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Irrational Exuberance (Speculation)</span><span class="ctrl-val" id="sm-exub-val">50</span></div>
+          <div class="input-row"><input type="range" min="0" max="100" value="50" id="sm-exub" oninput="smUpdate()"><input type="text" class="typed-input" id="sm-exub-t" value="50"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Interest Rate (%)</span><span class="ctrl-val" id="sm-ir-val">5</span></div>
+          <div class="input-row"><input type="range" min="0" max="15" value="5" id="sm-ir" oninput="smUpdate()"><input type="text" class="typed-input" id="sm-ir-t" value="5"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Corporate Earnings (EPS)</span><span class="ctrl-val" id="sm-earn-val">10</span></div>
+          <div class="input-row"><input type="range" min="1" max="30" value="10" id="sm-earn" oninput="smUpdate()"><input type="text" class="typed-input" id="sm-earn-t" value="10"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Investor Sentiment</span><span class="ctrl-val" id="sm-sent-val">60</span></div>
+          <div class="input-row"><input type="range" min="10" max="100" value="60" id="sm-sent" oninput="smUpdate()"><input type="text" class="typed-input" id="sm-sent-t" value="60"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Market Indicators</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Peak Price</div><div class="metric-val" id="sm-maxprice">—</div></div>
+          <div class="metric"><div class="metric-label">Bubble Premium</div><div class="metric-val" id="sm-premium">—</div></div>
+          <div class="metric"><div class="metric-label">P/E Ratio</div><div class="metric-val" id="sm-pe">—</div></div>
+          <div class="metric"><div class="metric-label">Crash Risk</div><div class="metric-val" id="sm-crash" style="font-size:13px">—</div></div>
+        </div>
+        <div class="explain" id="sm-explain">Speculation ও low interest = bubble recipe।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Asset Price vs Fundamental Value — Bubble Lifecycle</div>
+        <div class="chart-container"><canvas id="smChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <div class="legend">
+            <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Asset Price</div>
+            <div class="leg"><div class="leg-line" style="background:#34D399"></div> Fundamental Value</div>
+            <div class="leg"><div class="leg-line" style="background:#F472B6"></div> Bubble Premium</div>
+          </div>
+          <button class="export-btn" onclick="exportChart('smChart','asset-bubble')">⬇ Export PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODULE 13: KEYNESIAN CROSS ═══ -->
+<div id="page-kc" class="page">
+  <div class="module-title">🏗️ Keynesian Cross Model</div>
+  <div class="module-desc">Aggregate Expenditure ও 45° line-এর ছেদে equilibrium। Multiplier effect ও output gap সরাসরি দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🏗️ Expenditure Components</div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Autonomous Consumption (C₀)</span><span class="ctrl-val" id="kc-c0-val">50</span></div>
+          <div class="input-row"><input type="range" min="10" max="150" value="50" id="kc-c0" oninput="kcUpdate()"><input type="text" class="typed-input" id="kc-c0-t" value="50"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">MPC (Marginal Propensity to Consume)</span><span class="ctrl-val" id="kc-mpc-val">0.75</span></div>
+          <div class="input-row"><input type="range" min="50" max="90" value="75" id="kc-mpc" oninput="kcUpdate()"><input type="text" class="typed-input" id="kc-mpc-t" value="75"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Investment (I)</span><span class="ctrl-val" id="kc-inv-val">80</span></div>
+          <div class="input-row"><input type="range" min="0" max="200" value="80" id="kc-inv" oninput="kcUpdate()"><input type="text" class="typed-input" id="kc-inv-t" value="80"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Government Spending (G)</span><span class="ctrl-val" id="kc-g-val">100</span></div>
+          <div class="input-row"><input type="range" min="0" max="200" value="100" id="kc-g" oninput="kcUpdate()"><input type="text" class="typed-input" id="kc-g-t" value="100"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Net Exports (X-M)</span><span class="ctrl-val" id="kc-x-val">20</span></div>
+          <div class="input-row"><input type="range" min="-50" max="100" value="20" id="kc-x" oninput="kcUpdate()"><input type="text" class="typed-input" id="kc-x-t" value="20"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Tax (T)</span><span class="ctrl-val" id="kc-t-val">60</span></div>
+          <div class="input-row"><input type="range" min="0" max="150" value="60" id="kc-t" oninput="kcUpdate()"><input type="text" class="typed-input" id="kc-t-t" value="60"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Output</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Equilibrium Y*</div><div class="metric-val" id="kc-eqy">—</div></div>
+          <div class="metric"><div class="metric-label">Multiplier</div><div class="metric-val" id="kc-mult">—</div></div>
+          <div class="metric"><div class="metric-label">Consumption (C)</div><div class="metric-val" id="kc-cons">—</div></div>
+          <div class="metric"><div class="metric-label">Output Gap</div><div class="metric-val" id="kc-gap">—</div></div>
+        </div>
+        <div class="explain" id="kc-explain">AE curve ও 45° line-এর ছেদে equilibrium।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">Keynesian Cross — AE Curve & 45° Line</div>
+        <div class="chart-container"><canvas id="kcChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <div class="legend">
+            <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> AE = C+I+G+(X-M)</div>
+            <div class="leg"><div class="leg-line" style="background:#34D399"></div> 45° Line (Y=AE)</div>
+            <div class="leg"><div class="leg-dot" style="background:#F472B6"></div> Equilibrium Y*</div>
+          </div>
+          <button class="export-btn" onclick="exportChart('kcChart','keynesian-cross')">⬇ Export PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODULE 14: MUNDELL-FLEMING ═══ -->
+<div id="page-mf" class="page">
+  <div class="module-title">🌐 Mundell-Fleming Model <span style="font-size:13px;color:var(--muted);font-weight:400">— Open Economy IS-LM</span></div>
+  <div class="module-desc">উন্মুক্ত অর্থনীতিতে fiscal ও monetary policy-র কার্যকারিতা exchange rate regime অনুযায়ী পরিবর্তন হয়।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🌐 Exchange Rate Regime</div>
+        <div class="regime-row">
+          <button class="regime-btn active" id="mf-fixed-btn" onclick="setMFRegime('fixed')">🔒 Fixed Rate</button>
+          <button class="regime-btn" id="mf-float-btn" onclick="setMFRegime('float')">📈 Floating Rate</button>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Government Spending (G)</span><span class="ctrl-val" id="mf-g-val">50</span></div>
+          <div class="input-row"><input type="range" min="10" max="100" value="50" id="mf-g" oninput="mfUpdate()"><input type="text" class="typed-input" id="mf-g-t" value="50"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Money Supply (M)</span><span class="ctrl-val" id="mf-m-val">80</span></div>
+          <div class="input-row"><input type="range" min="30" max="150" value="80" id="mf-m" oninput="mfUpdate()"><input type="text" class="typed-input" id="mf-m-t" value="80"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">World Interest Rate (r*)</span><span class="ctrl-val" id="mf-rw-val">5</span></div>
+          <div class="input-row"><input type="range" min="1" max="15" value="5" id="mf-rw" oninput="mfUpdate()"><input type="text" class="typed-input" id="mf-rw-t" value="5"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Capital Mobility</span><span class="ctrl-val" id="mf-cap-val">50</span></div>
+          <div class="input-row"><input type="range" min="0" max="100" value="50" id="mf-cap" oninput="mfUpdate()"><input type="text" class="typed-input" id="mf-cap-t" value="50"></div>
+        </div>
+        <input type="hidden" id="mf-regime" value="fixed">
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Policy Effectiveness</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Output Y*</div><div class="metric-val" id="mf-eqy">—</div></div>
+          <div class="metric"><div class="metric-label">Exchange Rate e*</div><div class="metric-val" id="mf-eqe">—</div></div>
+          <div class="metric"><div class="metric-label">Regime</div><div class="metric-val" id="mf-regime-display" style="font-size:12px">—</div></div>
+          <div class="metric"><div class="metric-label">Policy Impact</div><div class="metric-val" id="mf-fiscal-eff" style="font-size:10px">—</div></div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px" id="mf-money-eff"></div>
+        <div class="explain" id="mf-explain">Regime পরিবর্তন করুন এবং policy effectiveness তুলনা করুন।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">IS*, LM* & BP Curves — Open Economy Equilibrium</div>
+        <div class="chart-container"><canvas id="mfChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <div class="legend">
+            <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> IS* Curve</div>
+            <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> LM* Curve</div>
+            <div class="leg"><div class="leg-line" style="background:#F472B6"></div> BP (Balance of Payments)</div>
+            <div class="leg"><div class="leg-dot" style="background:#34D399"></div> Equilibrium</div>
+          </div>
+          <button class="export-btn" onclick="exportChart('mfChart','mundell-fleming')">⬇ Export PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODULE 15: COST & PRODUCTION ═══ -->
+<div id="page-cp" class="page">
+  <div class="module-title">📐 Cost & Production Theory</div>
+  <div class="module-desc">Fixed cost, variable cost, marginal cost ও profit maximization। একই গ্রাফে TC, VC, MC ও ATC তুলনা করুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">📐 Production Controls</div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Fixed Cost (FC)</span><span class="ctrl-val" id="cp-fc-val">200</span></div>
+          <div class="input-row"><input type="range" min="0" max="800" value="200" step="10" id="cp-fc" oninput="cpUpdate()"><input type="text" class="typed-input" id="cp-fc-t" value="200"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Variable Cost Rate</span><span class="ctrl-val" id="cp-vc-val">2</span></div>
+          <div class="input-row"><input type="range" min="0.5" max="10" value="2" step="0.5" id="cp-vc" oninput="cpUpdate()"><input type="text" class="typed-input" id="cp-vc-t" value="2"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Returns to Scale (exponent)</span><span class="ctrl-val" id="cp-ret-val">0.50</span></div>
+          <div class="input-row"><input type="range" min="10" max="80" value="50" id="cp-ret" oninput="cpUpdate()"><input type="text" class="typed-input" id="cp-ret-t" value="50"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Market Price (P)</span><span class="ctrl-val" id="cp-price-val">25</span></div>
+          <div class="input-row"><input type="range" min="5" max="80" value="25" id="cp-price" oninput="cpUpdate()"><input type="text" class="typed-input" id="cp-price-t" value="25"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Production Outcomes</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Profit-Max Output Q</div><div class="metric-val" id="cp-profitq">—</div></div>
+          <div class="metric"><div class="metric-label">Max Profit / Loss</div><div class="metric-val" id="cp-profit">—</div></div>
+          <div class="metric"><div class="metric-label">Break-Even Q</div><div class="metric-val" id="cp-breakeven">—</div></div>
+          <div class="metric"><div class="metric-label">ATC at Q*</div><div class="metric-val" id="cp-atc-min">—</div></div>
+        </div>
+        <div class="explain" id="cp-explain">MC = Price হলে profit maximize হয়।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">TC, VC, MC & ATC — Multi-Curve Cost Analysis</div>
+        <div class="chart-container"><canvas id="cpChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <div class="legend">
+            <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Total Cost (TC)</div>
+            <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> Variable Cost (VC)</div>
+            <div class="leg"><div class="leg-line" style="background:#34D399"></div> Marginal Cost (MC)</div>
+            <div class="leg"><div class="leg-line" style="background:#F472B6"></div> ATC</div>
+          </div>
+          <button class="export-btn" onclick="exportChart('cpChart','cost-production')">⬇ Export PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODULE 16: ENVIRONMENTAL ECONOMICS ═══ -->
+<div id="page-env" class="page">
+  <div class="module-title">🌱 Environmental Economics — Carbon Tax Lab</div>
+  <div class="module-desc">Negative externality, Pigouvian tax ও social optimum। Carbon tax কীভাবে বাজার ব্যর্থতা সংশোধন করে দেখুন।</div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">🌱 Externality Controls</div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Externality Damage Level</span><span class="ctrl-val" id="env-ext-val">30</span></div>
+          <div class="input-row"><input type="range" min="0" max="80" value="30" id="env-ext" oninput="envUpdate()"><input type="text" class="typed-input" id="env-ext-t" value="30"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Carbon Tax Rate</span><span class="ctrl-val" id="env-tax-val">10</span></div>
+          <div class="input-row"><input type="range" min="0" max="60" value="10" id="env-tax" oninput="envUpdate()"><input type="text" class="typed-input" id="env-tax-t" value="10"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Demand Elasticity</span><span class="ctrl-val" id="env-elas-val">1.0</span></div>
+          <div class="input-row"><input type="range" min="3" max="20" value="10" id="env-elas" oninput="envUpdate()"><input type="text" class="typed-input" id="env-elas-t" value="10"></div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-top"><span class="ctrl-label">Emission Intensity</span><span class="ctrl-val" id="env-emit-val">50</span></div>
+          <div class="input-row"><input type="range" min="10" max="100" value="50" id="env-emit" oninput="envUpdate()"><input type="text" class="typed-input" id="env-emit-t" value="50"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Policy Outcomes</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Market Output Q</div><div class="metric-val" id="env-mktq">—</div></div>
+          <div class="metric"><div class="metric-label">Social Optimum Q*</div><div class="metric-val" id="env-socq">—</div></div>
+          <div class="metric"><div class="metric-label">Deadweight Loss</div><div class="metric-val" id="env-dwl">—</div></div>
+          <div class="metric"><div class="metric-label">Tax Revenue</div><div class="metric-val" id="env-taxrev">—</div></div>
+        </div>
+        <div class="explain" id="env-explain">Carbon tax externality সংশোধন করে সামাজিক কল্যাণ বাড়ায়।</div>
+      </div>
+    </div>
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">MSC, MPC, MSB Curves — Externality & Carbon Tax</div>
+        <div class="chart-container"><canvas id="envChart"></canvas></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px">
+          <div class="legend">
+            <div class="leg"><div class="leg-line" style="background:#F87171"></div> Social Cost (MSC)</div>
+            <div class="leg"><div class="leg-line" style="background:#4F8EF7"></div> Private Cost (MPC)</div>
+            <div class="leg"><div class="leg-line" style="background:#34D399"></div> Demand (MSB)</div>
+            <div class="leg"><div class="leg-line" style="background:#F59E0B"></div> After Carbon Tax</div>
+            <div class="leg"><div class="leg-dot" style="background:#F472B6"></div> Social Optimum</div>
+            <div class="leg"><div class="leg-dot" style="background:#F59E0B"></div> Market Eq.</div>
+          </div>
+          <button class="export-btn" onclick="exportChart('envChart','carbon-tax')">⬇ Export PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="modules-extra.js"></script>
+<script>
+// ── REGISTER NEW PAGES ──
+const extraInits = { bc: bcInit, stock: smInit, kc: kcInit, mf: mfInit, cp: cpInit, env: envInit };
+const origShow = showPage;
+window.showPage = function(id) {
+  origShow(id);
+  if (extraInits[id] && !inited[id]) { inited[id] = 1; extraInits[id](); }
+};
+
+// ── TYPED INPUTS SETUP (runs after DOM + JS loaded) ──
+window.addEventListener('load', () => {
+  const pairs = [
+    ['bc-shock','bc-shock-t',-20,20,bcUpdate],['bc-policy','bc-policy-t',0,20,bcUpdate],['bc-dur','bc-dur-t',8,32,bcUpdate],
+    ['sm-exub','sm-exub-t',0,100,smUpdate],['sm-ir','sm-ir-t',0,15,smUpdate],['sm-earn','sm-earn-t',1,30,smUpdate],['sm-sent','sm-sent-t',10,100,smUpdate],
+    ['kc-c0','kc-c0-t',10,150,kcUpdate],['kc-mpc','kc-mpc-t',50,90,kcUpdate],['kc-inv','kc-inv-t',0,200,kcUpdate],
+    ['kc-g','kc-g-t',0,200,kcUpdate],['kc-x','kc-x-t',-50,100,kcUpdate],['kc-t','kc-t-t',0,150,kcUpdate],
+    ['mf-g','mf-g-t',10,100,mfUpdate],['mf-m','mf-m-t',30,150,mfUpdate],['mf-rw','mf-rw-t',1,15,mfUpdate],['mf-cap','mf-cap-t',0,100,mfUpdate],
+    ['cp-fc','cp-fc-t',0,800,cpUpdate],['cp-vc','cp-vc-t',0.5,10,cpUpdate],['cp-ret','cp-ret-t',10,80,cpUpdate],['cp-price','cp-price-t',5,80,cpUpdate],
+    ['env-ext','env-ext-t',0,80,envUpdate],['env-tax','env-tax-t',0,60,envUpdate],['env-elas','env-elas-t',3,20,envUpdate],['env-emit','env-emit-t',10,100,envUpdate]
+  ];
+  pairs.forEach(([rid, tid, mn, mx, cb]) => {
+    if (typeof setupTypedInput === 'function') setupTypedInput(rid, tid, mn, mx, cb);
+  });
+  // sync existing sliders to typed inputs
+  pairs.forEach(([rid, tid]) => {
+    const r = document.getElementById(rid), t = document.getElementById(tid);
+    if (r && t) r.addEventListener('input', () => { t.value = r.value; });
+  });
+});
+
+// ── MUNDELL-FLEMING REGIME TOGGLE ──
+function setMFRegime(regime) {
+  document.getElementById('mf-regime').value = regime;
+  document.getElementById('mf-fixed-btn').classList.toggle('active', regime === 'fixed');
+  document.getElementById('mf-float-btn').classList.toggle('active', regime === 'float');
+  mfUpdate();
+}
+</script>
